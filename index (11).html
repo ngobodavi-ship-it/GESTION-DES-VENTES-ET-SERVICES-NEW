@@ -1,0 +1,2821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gestion Ventes">
+    <meta name="application-name" content="Gestion Ventes Pro">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiR2VzdGlvbiBWZW50ZXMgUHJvIiwic2hvcnRfbmFtZSI6Ikdlc3Rpb24gVmVudGVzIiwiZGVzY3JpcHRpb24iOiJTeXN0ZW1lIGNvbXBsZXQgZGUgZ2VzdGlvbiBkZXMgdmVudGVzIGF2ZWMgcmVjdXMgUERGIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJzdGFydF91cmwiOiIuIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMyNTYzZWIiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRSUzQ3JlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIGZpbGw9JyUyMzI1NjNlYicvJTNFJTNDdGV4dCB4PSc1MCcgeT0nNjAnIGZvbnQtc2l6ZT0nNDAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9J3doaXRlJyUzRSVGMCU5RiU5QiU5MiUzQy90ZXh0JTNFJTNDL3N2ZyUzRSIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+    <title>Gestion Ventes Pro - Responsive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-card) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Navigation mobile en bas */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 3px;
+        }
+
+        /* Container principal */
+        .container {
+            padding: 12px 12px 80px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header compact */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .header h1 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .header .shop-name {
+            font-size: 13px;
+            opacity: 0.95;
+            color: white;
+            font-weight: 700;
+        }
+
+        /* Stats compactes */
+        .stats-compact {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card-compact {
+            background: var(--bg-card);
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .stat-value-compact {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 3px;
+        }
+
+        .stat-label-compact {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Sections */
+        .section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Formulaire compact */
+        .form-group-compact {
+            margin-bottom: 10px;
+        }
+
+        .form-group-compact label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .form-group-compact input,
+        .form-group-compact select {
+            width: 100%;
+            padding: 9px 11px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .form-group-compact input:focus,
+        .form-group-compact select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Boutons */
+        .btn-compact {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-compact {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary-compact:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success-compact {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success-compact:active {
+            transform: scale(0.98);
+        }
+
+        .btn-small-compact {
+            padding: 7px 11px;
+            font-size: 11px;
+            display: inline-block;
+            width: auto;
+        }
+
+        /* Produits ajoutés */
+        .product-compact {
+            background: var(--bg-input);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+
+        .product-info-compact {
+            flex: 1;
+        }
+
+        .product-name-compact {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--text-primary);
+        }
+
+        .product-details-compact {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .btn-remove {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Total */
+        .total-compact {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            margin: 10px 0;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .total-label-compact {
+            font-size: 10px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+
+        .total-amount-compact {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* Liste compacte */
+        .list-item-compact {
+            background: var(--bg-card);
+            padding: 11px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .list-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .list-item-amount {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .list-item-details {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .badge-compact {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        /* Tabs */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Recherche */
+        .search-box {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 11px 9px 36px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content-compact {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 18px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .modal-title-compact {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+        }
+
+        /* Ajustements pour les petits écrans */
+        @media (max-width: 360px) {
+            .stats-compact {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value-compact {
+                font-size: 18px;
+            }
+        }
+
+        /* Input number sans spinner */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Grid produit compact */
+        .product-grid-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .product-grid-compact input {
+            padding: 10px;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .modal-content-compact::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .modal-content-compact::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 12px;
+        }
+
+
+        /* ÉCRAN CONNEXION */
+        #authOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        #authOverlay.hide { display: none !important; }
+        .ab { background: white; border-radius: 20px; padding: 40px 30px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .al { font-size: 60px; text-align: center; margin-bottom: 10px; }
+        .at { color: #1e293b; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 5px; }
+        .as { color: #64748b; font-size: 13px; text-align: center; margin-bottom: 25px; }
+        .ag { margin-bottom: 15px; }
+        .ag label { display: block; color: #334155; font-weight: 600; margin-bottom: 6px; font-size: 13px; }
+        .ai { width: 100%; padding: 11px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; }
+        .ai:focus { outline: none; border-color: #667eea; }
+        .abtn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .abtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ap { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .as2 { background: #e2e8f0; color: #334155; margin-top: 10px; }
+        .aerr { background: #fee2e2; color: #dc2626; padding: 11px; border-radius: 8px; margin-bottom: 12px; display: none; font-size: 13px; }
+        .aok { background: #d1fae5; color: #059669; padding: 11px; border-radius: 8px; margin-bottom: 12px; display: none; font-size: 13px; }
+        .adiv { text-align: center; margin: 15px 0; color: #94a3b8; font-size: 13px; }
+        .alink { background: none; border: none; color: #667eea; text-decoration: underline; cursor: pointer; font-size: 13px; font-family: inherit; }
+        .ahide { display: none !important; }
+
+        /* ========================================
+           RESPONSIVE DESIGN - TABLET & DESKTOP
+           ======================================== */
+        
+        @media (min-width: 768px) {
+            /* TABLETTES (768px+) */
+            .container {
+                max-width: 900px;
+                padding: 20px 24px 100px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .header .shop-name {
+                font-size: 15px;
+            }
+
+            .stats-compact {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+
+            .stat-value-compact {
+                font-size: 26px;
+            }
+
+            .stat-label-compact {
+                font-size: 12px;
+            }
+
+            .form-group-compact label,
+            .search-box input {
+                font-size: 14px;
+            }
+
+            .btn-compact {
+                font-size: 15px;
+                padding: 12px 20px;
+            }
+
+            .list-item-name {
+                font-size: 15px;
+            }
+
+            .list-item-amount {
+                font-size: 18px;
+            }
+
+            /* Tableaux plus lisibles */
+            table {
+                font-size: 13px !important;
+            }
+
+            th, td {
+                padding: 10px !important;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            /* DESKTOP (1024px+) */
+            
+            body {
+                display: flex;
+            }
+
+            /* Navigation latérale sur desktop */
+            .bottom-nav {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                right: auto;
+                width: 220px;
+                flex-direction: column;
+                justify-content: flex-start;
+                padding: 24px 0;
+                border-top: none;
+                border-right: 1px solid var(--border);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+            }
+
+            .nav-item {
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 14px 24px;
+                font-size: 14px;
+                border-left: 3px solid transparent;
+                margin: 4px 0;
+            }
+
+            .nav-item.active {
+                border-left-color: var(--primary);
+                background: rgba(37, 99, 235, 0.1);
+            }
+
+            .nav-item:hover {
+                background: rgba(255,255,255,0.05);
+            }
+
+            .nav-icon {
+                font-size: 24px;
+                margin-bottom: 0;
+                margin-right: 12px;
+            }
+
+            /* Container avec sidebar */
+            .container {
+                margin-left: 220px;
+                max-width: 1400px;
+                padding: 24px 32px 32px;
+                width: calc(100% - 220px);
+            }
+
+            /* Header plus grand */
+            .header {
+                padding: 20px 28px;
+                margin-bottom: 20px;
+                border-radius: 16px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+                margin-bottom: 6px;
+            }
+
+            .header .shop-name {
+                font-size: 18px;
+            }
+
+            /* Stats en ligne */
+            .stats-compact {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card-compact {
+                padding: 20px;
+                border-radius: 14px;
+            }
+
+            .stat-value-compact {
+                font-size: 32px;
+                margin-bottom: 6px;
+            }
+
+            .stat-label-compact {
+                font-size: 13px;
+            }
+
+            /* Section plus espacée */
+            .section {
+                padding: 24px;
+                margin-bottom: 20px;
+                border-radius: 14px;
+            }
+
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 18px;
+            }
+
+            /* Forms en 2 colonnes */
+            .form-group-compact {
+                margin-bottom: 18px;
+            }
+
+            .form-group-compact label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            .form-group-compact input,
+            .form-group-compact select,
+            .form-group-compact textarea {
+                padding: 12px 16px;
+                font-size: 15px;
+                border-radius: 10px;
+            }
+
+            /* Boutons plus grands */
+            .btn-compact {
+                padding: 14px 28px;
+                font-size: 16px;
+                border-radius: 10px;
+            }
+
+            .btn-small-compact {
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            /* Liste items plus espacés */
+            .list-item-compact {
+                padding: 18px;
+                margin-bottom: 12px;
+                border-radius: 12px;
+            }
+
+            .list-item-name {
+                font-size: 16px;
+            }
+
+            .list-item-details {
+                font-size: 13px;
+            }
+
+            .list-item-amount {
+                font-size: 20px;
+            }
+
+            /* Produits en grille */
+            .product-compact {
+                padding: 16px;
+                margin-bottom: 10px;
+            }
+
+            .product-name-compact {
+                font-size: 16px;
+            }
+
+            /* Tableaux optimisés desktop */
+            table {
+                font-size: 14px !important;
+            }
+
+            th {
+                padding: 14px !important;
+                font-size: 14px !important;
+            }
+
+            td {
+                padding: 12px !important;
+            }
+
+            /* Recherche plus large */
+            .search-box {
+                max-width: 600px;
+            }
+
+            .search-box input {
+                padding: 14px 14px 14px 45px;
+                font-size: 15px;
+            }
+
+            /* Modales plus grandes */
+            .modal-compact {
+                max-width: 600px;
+                padding: 32px;
+                border-radius: 16px;
+            }
+
+            .modal-title-compact {
+                font-size: 22px;
+                margin-bottom: 24px;
+            }
+
+            /* Auth box desktop */
+            .ab {
+                max-width: 480px;
+                padding: 48px 40px;
+            }
+
+            .at {
+                font-size: 26px;
+            }
+
+            .as {
+                font-size: 15px;
+            }
+
+            /* Scroll personnalisé */
+            ::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--bg-card);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--border);
+                border-radius: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--primary);
+            }
+        }
+
+        @media (min-width: 1440px) {
+            /* GRAND ÉCRAN (1440px+) */
+            
+            .container {
+                max-width: 1600px;
+            }
+
+            .stats-compact {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            /* Plus d'espace partout */
+            .section {
+                padding: 28px;
+            }
+
+            .header {
+                padding: 24px 32px;
+            }
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            .bottom-nav,
+            .btn-compact,
+            .search-box,
+            .nav-item {
+                display: none !important;
+            }
+
+            .container {
+                margin-left: 0;
+                width: 100%;
+                padding: 0;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="authOverlay">
+    <div class="ab">
+        <div class="al">📊</div>
+        <h1 class="at">Gestion des Ventes et Services</h1>
+        <p class="as" id="asub">Connectez-vous</p>
+        <div id="aerr" class="aerr"></div>
+        <div id="aok" class="aok"></div>
+        <div id="fLogin">
+            <div class="ag"><label>Email</label><input type="email" id="iEmail" class="ai" placeholder="email@example.com"></div>
+            <div class="ag"><label>Mot de passe</label><input type="password" id="iPwd" class="ai" placeholder="••••••••"></div>
+            <button class="abtn ap" id="btnLogin" onclick="doLogin()">🔓 Se Connecter</button>
+            <div class="adiv">ou</div>
+            <button class="abtn as2" onclick="goTo('Reg')">✨ Créer un Compte</button>
+            <div style="text-align:center;margin-top:12px;"><button class="alink" onclick="goTo('Forgot')">Mot de passe oublié ?</button></div>
+        </div>
+        <div id="fReg" class="ahide">
+            <div class="ag"><label>Nom complet</label><input type="text" id="iName" class="ai" placeholder="Jean Dupont"></div>
+            <div class="ag"><label>Email</label><input type="email" id="iRegEmail" class="ai" placeholder="email@example.com"></div>
+            <div class="ag"><label>Mot de passe (min. 6)</label><input type="password" id="iRegPwd" class="ai" placeholder="••••••••"></div>
+            <div class="ag"><label>Confirmer</label><input type="password" id="iRegPwd2" class="ai" placeholder="••••••••"></div>
+            <button class="abtn ap" id="btnReg" onclick="doRegister()">✅ Créer mon Compte</button>
+            <div style="text-align:center;margin-top:15px;"><button class="alink" onclick="goTo('Login')">← Retour</button></div>
+        </div>
+        <div id="fForgot" class="ahide">
+            <p style="color:#64748b;font-size:13px;margin-bottom:15px;">Entrez votre email pour recevoir un lien.</p>
+            <div class="ag"><label>Email</label><input type="email" id="iForgot" class="ai" placeholder="email@example.com"></div>
+            <button class="abtn ap" onclick="doReset()">📧 Envoyer</button>
+            <div style="text-align:center;margin-top:15px;"><button class="alink" onclick="goTo('Login')">← Retour</button></div>
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+
+        <!-- Page Vente -->
+        <div id="page-vente" class="page active">
+            <div class="header">
+                <div class="shop-name" id="shopNameDisplay">Ma Boutique</div>
+                <h1>Gestion des Ventes et Services</h1>
+                <div style="font-size: 11px; opacity: 0.85; margin-top: 4px;">
+                    <span id="userEmailDisplay"></span>
+                    <button onclick="logoutEmail()" style="background: var(--danger); color: white; border: none; padding: 4px 10px; border-radius: 5px; font-size: 10px; margin-left: 10px; cursor: pointer;">🚪 Déconnexion</button>
+                </div>
+            </div>
+            <script>
+                // User display handled by Firebase auth above
+            </script>
+
+            <div class="stats-compact">
+                <div class="stat-card-compact">
+                    <div class="stat-value-compact" id="todaySalesMobile">0</div>
+                    <div class="stat-label-compact">Ventes aujourd'hui</div>
+                </div>
+                <div class="stat-card-compact">
+                    <div class="stat-value-compact" id="todayRevenueMobile">0</div>
+                    <div class="stat-label-compact">Revenu aujourd'hui (FCFA)</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <form id="saleFormMobile">
+                    <div class="form-group-compact">
+                        <label>Client</label>
+                        <input type="text" id="clientNameMobile" placeholder="Nom du client" required>
+                    </div>
+
+                    <div class="form-group-compact">
+                        <label>Telephone (WhatsApp)</label>
+                        <input type="tel" id="clientPhoneMobile" placeholder="+242 06 XXX XXXX" required>
+                    </div>
+
+                    <div class="form-group-compact">
+                        <label>Mode de paiement</label>
+                        <select id="paymentMethodMobile">
+                            <option value="cash">Comptant</option>
+                            <option value="credit">A Credit</option>
+                            <option value="partial">Avance</option>
+                        </select>
+                    </div>
+
+                    <div id="partialFieldsMobile" style="display: none;">
+                        <div class="form-group-compact">
+                            <label>Montant de l'avance</label>
+                            <input type="number" id="advanceAmountMobile" placeholder="Montant paye" min="0">
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-top: 16px;">Articles</div>
+                    
+                    <div class="product-grid-compact">
+                        <input type="text" id="productNameMobile" placeholder="Nom de l'article">
+                        <input type="number" id="productQtyMobile" placeholder="Quantite" value="1" min="1">
+                        <input type="number" id="productPriceMobile" placeholder="Prix unitaire" min="0">
+                    </div>
+                    
+                    <button type="button" class="btn-compact btn-primary-compact btn-small-compact" onclick="addProductMobile()">+ Ajouter</button>
+
+                    <div id="productsListMobile" style="margin-top: 12px;"></div>
+
+                    <div class="total-compact">
+                        <div class="total-label-compact">TOTAL</div>
+                        <div class="total-amount-compact" id="totalAmountMobile">0 FCFA</div>
+                    </div>
+
+                    <button type="submit" class="btn-compact btn-success-compact">Finaliser la Vente</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page Historique -->
+        <div id="page-historique" class="page">
+            <div class="header">
+                <div class="shop-name" id="shopNameDisplayHistory">Ma Boutique</div>
+                <h1>Gestion des Ventes et Services</h1>
+                <div style="font-size: 11px; opacity: 0.85; margin-top: 4px;">Systeme complet avec recus PDF et bilans financiers</div>
+            </div>
+
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchHistoryMobile" placeholder="Rechercher un client..." onkeyup="searchHistoryMobile()">
+            </div>
+
+            <div id="historyListMobile"></div>
+        </div>
+
+        <!-- Page Credits -->
+        <div id="page-credits" class="page">
+            <div class="header">
+                <div class="shop-name" id="shopNameDisplayCredits">Ma Boutique</div>
+                <h1>Gestion des Ventes et Services</h1>
+                <div style="font-size: 11px; opacity: 0.85; margin-top: 4px;">Systeme complet avec recus PDF et bilans financiers</div>
+            </div>
+
+            <div class="stats-compact">
+                <div class="stat-card-compact">
+                    <div class="stat-value-compact" style="color: #ef4444;" id="totalCreditsMobile">0</div>
+                    <div class="stat-label-compact">Crédits-Avances</div>
+                </div>
+                <div class="stat-card-compact">
+                    <div class="stat-value-compact" style="color: #f59e0b;" id="totalPartialMobile">0</div>
+                    <div class="stat-label-compact">Avances en cours</div>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchCreditsMobile" placeholder="Rechercher un client..." onkeyup="searchCreditsMobile()">
+            </div>
+
+            <div id="creditsListMobile"></div>
+        </div>
+
+        <!-- Page Rapports -->
+        <div id="page-rapports" class="page">
+            <div class="header">
+                <div class="shop-name" id="shopNameDisplayRapports">Ma Boutique</div>
+                <h1>Gestion des Ventes et Services</h1>
+                <div style="font-size: 11px; opacity: 0.85; margin-top: 4px;">Systeme complet avec recus PDF et bilans financiers</div>
+            </div>
+
+            <div class="section">
+                <div class="form-group-compact">
+                    <label>Periode</label>
+                    <select id="periodMobile" onchange="generateReportMobile()">
+                        <option value="day">Journalier</option>
+                        <option value="week">Hebdomadaire</option>
+                        <option value="month">Mensuel</option>
+                    </select>
+                </div>
+
+                <div class="form-group-compact">
+                    <label>Date</label>
+                    <input type="date" id="reportDateMobile" onchange="generateReportMobile()">
+                </div>
+
+                <button class="btn-compact btn-success-compact" onclick="exportReportPDFMobile()">📄 Exporter PDF</button>
+                <button class="btn-compact btn-primary-compact" onclick="exportReportExcelMobile()" style="margin-top: 8px;">📊 Exporter Excel</button>
+            </div>
+
+            <div id="reportContentMobile"></div>
+        </div>
+
+        <!-- Page Parametres -->
+        <div id="page-params" class="page">
+            <div class="header">
+                <div class="shop-name" id="shopNameDisplayParams">Ma Boutique</div>
+                <h1>Gestion des Ventes et Services</h1>
+                <div style="font-size: 11px; opacity: 0.85; margin-top: 4px;">Systeme complet avec recus PDF et bilans financiers</div>
+            </div>
+
+
+            <div class="section">
+                <div class="section-title">Informations Boutique</div>
+                
+                <div class="form-group-compact">
+                    <label>Nom de la boutique</label>
+                    <input type="text" id="shopNameInputMobile" placeholder="Nom de votre boutique">
+                </div>
+
+                <div class="form-group-compact">
+                    <label>Adresse</label>
+                    <input type="text" id="shopAddressInputMobile" placeholder="Adresse">
+                </div>
+
+                <div class="form-group-compact">
+                    <label>Telephone</label>
+                    <input type="tel" id="shopPhoneInputMobile" placeholder="+242 06 XXX XXXX">
+                </div>
+
+                <button class="btn-compact btn-success-compact" onclick="saveConfigMobile()">Enregistrer</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Catalogue Produits</div>
+                
+                <div class="search-box" style="margin-bottom: 12px;">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchCatalogMobile" placeholder="Rechercher un produit..." onkeyup="searchCatalogMobile()" style="width: 100%; padding: 12px 12px 12px 40px; border: 2px solid var(--bg-card); border-radius: 10px; background: var(--bg-input); color: var(--text-primary);">
+                </div>
+                
+                <button class="btn-compact btn-primary-compact" onclick="showAddProductCatalogMobile()">+ Ajouter un Produit</button>
+                <div id="catalogListMobile" style="margin-top: 12px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchPageMobile('vente')">
+            <div class="nav-icon">🛒</div>
+            <div>Vente</div>
+        </button>
+        <button class="nav-item" onclick="switchPageMobile('historique')">
+            <div class="nav-icon">📜</div>
+            <div>Historique</div>
+        </button>
+        <button class="nav-item" onclick="switchPageMobile('credits')">
+            <div class="nav-icon">💳</div>
+            <div>Crédits-Avances</div>
+        </button>
+        <button class="nav-item" onclick="switchPageMobile('rapports')">
+            <div class="nav-icon">📊</div>
+            <div>Rapports</div>
+        </button>
+        <button class="nav-item" onclick="switchPageMobile('params')">
+            <div class="nav-icon">⚙️</div>
+            <div>Parametres</div>
+        </button>
+    </div>
+
+    <!-- Modal Edit -->
+    <div id="editModalMobile" class="modal-overlay">
+        <div class="modal-content-compact">
+            <div class="modal-title-compact">Editer la Vente</div>
+            <div id="editFormContentMobile"></div>
+        </div>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        // Variables globales
+        let shopConfig = {
+            name: 'Ma Boutique',
+            address: 'Pointe-Noire, Congo',
+            phone: '+242 06 XXX XXXX'
+        };
+        let currentProducts = [];
+        let salesHistory = [];
+        let productCatalog = [];
+        let currentReportData = []; // Pour la recherche dans le rapport
+
+        // Charger données
+        window.loadData = function loadData() {
+            const saved = localStorage.getItem('salesDataMobile');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    salesHistory = data.salesHistory || [];
+                    productCatalog = data.productCatalog || [];
+                    shopConfig = data.shopConfig || shopConfig;
+                    updateShopDisplayMobile();
+                    updateStatsMobile();
+                    renderHistoryMobile();
+                    renderCreditsMobile();
+                    renderCatalogMobile();
+                } catch(e) {
+                    console.error('Erreur chargement données:', e);
+                }
+            }
+            
+            // Charger le rapport seulement si l'élément existe
+            const reportDate = document.getElementById('reportDateMobile');
+            if (reportDate) {
+                reportDate.valueAsDate = new Date();
+                generateReportMobile();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('salesDataMobile', JSON.stringify({
+                salesHistory,
+                productCatalog,
+                shopConfig
+            }));
+        }
+
+        function updateShopDisplayMobile() {
+            const name = shopConfig.name;
+            document.getElementById('shopNameDisplay').textContent = name;
+            document.getElementById('shopNameDisplayHistory').textContent = name;
+            document.getElementById('shopNameDisplayCredits').textContent = name;
+            document.getElementById('shopNameDisplayRapports').textContent = name;
+            document.getElementById('shopNameDisplayParams').textContent = name;
+        }
+
+        // Navigation
+        function switchPageMobile(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`page-${page}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if (page === 'historique') renderHistoryMobile();
+            if (page === 'credits') renderCreditsMobile();
+            if (page === 'rapports') generateReportMobile();
+            if (page === 'params') loadParamsMobile();
+        }
+
+        // Produits
+        function addProductMobile() {
+            const name = document.getElementById('productNameMobile').value.trim();
+            const qty = parseInt(document.getElementById('productQtyMobile').value);
+            const price = parseFloat(document.getElementById('productPriceMobile').value);
+
+            if (!name || !qty || !price) {
+                alert('Remplissez tous les champs');
+                return;
+            }
+
+            currentProducts.push({
+                id: Date.now(),
+                name,
+                quantity: qty,
+                price,
+                total: qty * price
+            });
+
+            document.getElementById('productNameMobile').value = '';
+            document.getElementById('productQtyMobile').value = '1';
+            document.getElementById('productPriceMobile').value = '';
+
+            renderProductsMobile();
+        }
+
+        function renderProductsMobile() {
+            const container = document.getElementById('productsListMobile');
+            
+            if (currentProducts.length === 0) {
+                container.innerHTML = '';
+                document.getElementById('totalAmountMobile').textContent = '0 FCFA';
+                return;
+            }
+
+            container.innerHTML = currentProducts.map(p => `
+                <div class="product-compact">
+                    <div class="product-info-compact">
+                        <div class="product-name-compact">${p.name}</div>
+                        <div class="product-details-compact">${p.quantity} x ${formatMoney(p.price)} = ${formatMoney(p.total)}</div>
+                    </div>
+                    <button type="button" class="btn-remove" onclick="removeProductMobile(${p.id})">×</button>
+                </div>
+            `).join('');
+
+            const total = currentProducts.reduce((sum, p) => sum + p.total, 0);
+            document.getElementById('totalAmountMobile').textContent = formatMoney(total);
+        }
+
+        function removeProductMobile(id) {
+            currentProducts = currentProducts.filter(p => p.id !== id);
+            renderProductsMobile();
+        }
+
+        // Finaliser vente
+        document.getElementById('saleFormMobile').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (currentProducts.length === 0) {
+                alert('Ajoutez au moins un article');
+                return;
+            }
+
+            const clientName = document.getElementById('clientNameMobile').value;
+            const clientPhone = document.getElementById('clientPhoneMobile').value;
+            const paymentMethod = document.getElementById('paymentMethodMobile').value;
+            const total = currentProducts.reduce((sum, p) => sum + p.total, 0);
+
+            let amountPaid = total;
+            let amountOwed = 0;
+
+            if (paymentMethod === 'credit') {
+                amountPaid = 0;
+                amountOwed = total;
+            } else if (paymentMethod === 'partial') {
+                amountPaid = parseFloat(document.getElementById('advanceAmountMobile').value || 0);
+                if (amountPaid <= 0 || amountPaid >= total) {
+                    alert('Montant d\'avance invalide');
+                    return;
+                }
+                amountOwed = total - amountPaid;
+            }
+
+            const sale = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                clientName,
+                clientPhone,
+                products: [...currentProducts],
+                total,
+                paymentMethod,
+                amountPaid,
+                amountOwed
+            };
+
+            salesHistory.unshift(sale);
+            saveData();
+
+            // Generer PDF
+            const pdfBlob = await generatePDFReceiptMobile(sale);
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Recu_${clientName.replace(/\s/g, '_')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // WhatsApp
+            const message = generateWhatsAppMessageMobile(sale);
+            const whatsappUrl = `https://wa.me/${clientPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+
+            alert('Vente enregistree ! PDF telecharge et WhatsApp ouvert.');
+
+            // Reset
+            currentProducts = [];
+            document.getElementById('saleFormMobile').reset();
+            renderProductsMobile();
+            updateStatsMobile();
+        });
+
+        // WhatsApp message
+        function generateWhatsAppMessageMobile(sale) {
+            const date = new Date(sale.date);
+            let msg = `Bonjour *${sale.clientName}*,\n\n`;
+            msg += `Merci pour votre achat chez *${shopConfig.name}* !\n\n`;
+            msg += `Date: ${date.toLocaleDateString('fr-FR')}\n\n`;
+            msg += `Articles achetes:\n`;
+            sale.products.forEach(p => {
+                msg += `• ${p.name} x ${p.quantity}\n`;
+            });
+            msg += `\nTotal: ${formatMoney(sale.total)}\n`;
+            
+            if (sale.paymentMethod === 'credit') {
+                msg += `MODE: A CREDIT\n`;
+                msg += `RESTE A PAYER: ${formatMoney(sale.amountOwed)}\n`;
+            } else if (sale.paymentMethod === 'partial') {
+                msg += `MODE: AVANCE\n`;
+                msg += `Paye: ${formatMoney(sale.amountPaid)}\n`;
+                msg += `Reste: ${formatMoney(sale.amountOwed)}\n`;
+            } else {
+                msg += `PAYE EN TOTALITE\n`;
+            }
+            
+            msg += `\nVotre recu PDF est en piece jointe.\n\n`;
+            msg += `${shopConfig.name}\n${shopConfig.phone}\n\nA bientot !`;
+            
+            return msg;
+        }
+
+        // PDF Receipt
+        async function generatePDFReceiptMobile(sale) {
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            let yPos = 20;
+
+            function formatMoneyPDF(amount) {
+                return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
+            }
+
+            // Header
+            doc.setFillColor(37, 99, 235);
+            doc.rect(0, 0, pageWidth, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            
+            let title = 'RECU DE VENTE';
+            if (sale.paymentMethod === 'credit') title = 'RECU A CREDIT';
+            else if (sale.paymentMethod === 'partial') title = 'RECU AVANCE';
+            
+            doc.text(title, pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text(shopConfig.name, pageWidth / 2, 25, { align: 'center' });
+            doc.setFontSize(9);
+            doc.text(shopConfig.address, pageWidth / 2, 32, { align: 'center' });
+
+            doc.setTextColor(0, 0, 0);
+            yPos = 50;
+
+            // Info
+            const saleDate = new Date(sale.date);
+            doc.setFontSize(10);
+            doc.text(`Date: ${saleDate.toLocaleDateString('fr-FR')}`, 20, yPos);
+            yPos += 6;
+            doc.text(`Client: ${sale.clientName}`, 20, yPos);
+            yPos += 6;
+            doc.text(`Tel: ${sale.clientPhone}`, 20, yPos);
+
+            // Articles
+            yPos += 12;
+            doc.setFont(undefined, 'bold');
+            doc.text('ARTICLES', 20, yPos);
+            doc.setFont(undefined, 'normal');
+            yPos += 8;
+
+            sale.products.forEach(p => {
+                doc.text(`${p.name} (${p.quantity}x)`, 20, yPos);
+                doc.text(formatMoneyPDF(p.total), pageWidth - 20, yPos, { align: 'right' });
+                yPos += 6;
+            });
+
+            // Total
+            yPos += 5;
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos, pageWidth - 20, yPos);
+            yPos += 8;
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(12);
+            doc.text('TOTAL:', 20, yPos);
+            doc.text(formatMoneyPDF(sale.total), pageWidth - 20, yPos, { align: 'right' });
+
+            // Payment info
+            yPos += 12;
+            doc.setFontSize(10);
+            if (sale.paymentMethod === 'credit') {
+                doc.setTextColor(220, 38, 38);
+                doc.text('MODE A CREDIT', 20, yPos);
+                yPos += 6;
+                doc.text(`RESTE A PAYER: ${formatMoneyPDF(sale.amountOwed)}`, 20, yPos);
+            } else if (sale.paymentMethod === 'partial') {
+                doc.setTextColor(245, 158, 11);
+                doc.text('MODE AVANCE', 20, yPos);
+                yPos += 6;
+                doc.setTextColor(16, 185, 129);
+                doc.text(`Paye: ${formatMoneyPDF(sale.amountPaid)}`, 20, yPos);
+                yPos += 6;
+                doc.setTextColor(220, 38, 38);
+                doc.text(`Reste: ${formatMoneyPDF(sale.amountOwed)}`, 20, yPos);
+            } else {
+                doc.setTextColor(16, 185, 129);
+                doc.text('PAYE EN TOTALITE', 20, yPos);
+            }
+
+            // Footer
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(8);
+            doc.text('Merci pour votre achat !', pageWidth / 2, 280, { align: 'center' });
+            doc.text(shopConfig.phone, pageWidth / 2, 286, { align: 'center' });
+
+            return doc.output('blob');
+        }
+
+        // Stats
+        function updateStatsMobile() {
+            const today = new Date().toDateString();
+            const todaySales = salesHistory.filter(s => new Date(s.date).toDateString() === today);
+            
+            document.getElementById('todaySalesMobile').textContent = todaySales.length;
+            const todayRevenue = todaySales.reduce((sum, s) => sum + s.total, 0);
+            document.getElementById('todayRevenueMobile').textContent = Math.round(todayRevenue).toLocaleString('fr-FR');
+            
+            const credits = salesHistory.filter(s => s.paymentMethod === 'credit' && s.amountOwed > 0);
+            const partial = salesHistory.filter(s => s.paymentMethod === 'partial' && s.amountOwed > 0);
+            
+            document.getElementById('totalCreditsMobile').textContent = credits.length;
+            document.getElementById('totalPartialMobile').textContent = partial.length;
+        }
+
+        // Historique
+        function renderHistoryMobile(filtered = null) {
+            const container = document.getElementById('historyListMobile');
+            const sales = filtered || salesHistory;
+
+            if (sales.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">Aucune vente</div>';
+                return;
+            }
+
+            container.innerHTML = sales.map(s => {
+                const date = new Date(s.date);
+                let badge = '';
+                if (s.paymentMethod === 'credit') badge = '<span class="badge-compact badge-danger">CREDIT</span>';
+                else if (s.paymentMethod === 'partial') badge = '<span class="badge-compact badge-warning">AVANCE</span>';
+                else badge = '<span class="badge-compact badge-success">PAYE</span>';
+
+                return `
+                    <div class="list-item-compact">
+                        <div class="list-item-header">
+                            <div>
+                                <div class="list-item-name">${s.clientName}</div>
+                                <div class="list-item-details">${date.toLocaleDateString('fr-FR')} • ${s.products.length} articles</div>
+                            </div>
+                            <div class="list-item-amount">${formatMoney(s.total)}</div>
+                        </div>
+                        <div class="list-item-details">${s.products.map(p => p.name).join(', ')}</div>
+                        <div style="margin-top:6px;">${badge}</div>
+                        <div class="list-item-actions">
+                            <button class="btn-compact btn-primary-compact btn-small-compact" onclick="resendReceiptMobile(${s.id})">PDF</button>
+                            <button class="btn-compact btn-success-compact btn-small-compact" onclick="editSaleMobile(${s.id})" style="background:#f59e0b;">Éditer</button>
+                            <button class="btn-compact btn-danger-compact btn-small-compact" onclick="deleteSaleMobile(${s.id})">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function searchHistoryMobile() {
+            const term = document.getElementById('searchHistoryMobile').value.toLowerCase();
+            if (!term) {
+                renderHistoryMobile();
+                return;
+            }
+            const filtered = salesHistory.filter(s => 
+                s.clientName.toLowerCase().includes(term) || s.clientPhone.includes(term)
+            );
+            renderHistoryMobile(filtered);
+        }
+
+        async function resendReceiptMobile(id) {
+            const sale = salesHistory.find(s => s.id === id);
+            if (!sale) return;
+
+            const pdfBlob = await generatePDFReceiptMobile(sale);
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Recu_${sale.clientName.replace(/\s/g, '_')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            const message = generateWhatsAppMessageMobile(sale);
+            const whatsappUrl = `https://wa.me/${sale.clientPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function editSaleMobile(id) {
+            const sale = salesHistory.find(s => s.id === id);
+            if (!sale) return;
+
+            const modal = document.getElementById('editModalMobile');
+            const content = document.getElementById('editFormContentMobile');
+
+            content.innerHTML = `
+                <div class="form-group-compact">
+                    <label>Client</label>
+                    <input type="text" id="editNameMobile" value="${sale.clientName}">
+                </div>
+                <div class="form-group-compact">
+                    <label>Telephone</label>
+                    <input type="tel" id="editPhoneMobile" value="${sale.clientPhone}">
+                </div>
+                <div class="form-group-compact">
+                    <label>Mode de paiement</label>
+                    <select id="editPaymentMobile">
+                        <option value="cash" ${sale.paymentMethod === 'cash' ? 'selected' : ''}>Comptant</option>
+                        <option value="credit" ${sale.paymentMethod === 'credit' ? 'selected' : ''}>A Credit</option>
+                        <option value="partial" ${sale.paymentMethod === 'partial' ? 'selected' : ''}>Avance</option>
+                    </select>
+                </div>
+                <div id="editPartialMobile" style="display: ${sale.paymentMethod === 'partial' ? 'block' : 'none'};">
+                    <div class="form-group-compact">
+                        <label>Montant paye</label>
+                        <input type="number" id="editAmountMobile" value="${sale.amountPaid || 0}" max="${sale.total}">
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:20px;">
+                    <button class="btn-compact btn-success-compact" style="flex:1;" onclick="saveSaleEditMobile(${id})">Enregistrer</button>
+                    <button class="btn-compact" style="flex:1;background:#666;color:white;" onclick="closeEditModalMobile()">Annuler</button>
+                </div>
+            `;
+
+            document.getElementById('editPaymentMobile').addEventListener('change', function() {
+                document.getElementById('editPartialMobile').style.display = this.value === 'partial' ? 'block' : 'none';
+            });
+
+            modal.classList.add('active');
+        }
+
+        function saveSaleEditMobile(id) {
+            const sale = salesHistory.find(s => s.id === id);
+            if (!sale) return;
+
+            sale.clientName = document.getElementById('editNameMobile').value;
+            sale.clientPhone = document.getElementById('editPhoneMobile').value;
+            sale.paymentMethod = document.getElementById('editPaymentMobile').value;
+
+            if (sale.paymentMethod === 'partial') {
+                const paid = parseFloat(document.getElementById('editAmountMobile').value || 0);
+                sale.amountPaid = paid;
+                sale.amountOwed = sale.total - paid;
+            } else if (sale.paymentMethod === 'credit') {
+                sale.amountPaid = 0;
+                sale.amountOwed = sale.total;
+            } else {
+                sale.amountPaid = sale.total;
+                sale.amountOwed = 0;
+            }
+
+            saveData();
+            updateStatsMobile();
+            renderHistoryMobile();
+            renderCreditsMobile();
+            closeEditModalMobile();
+            alert('Vente mise a jour !');
+        }
+
+        function closeEditModalMobile() {
+            document.getElementById('editModalMobile').classList.remove('active');
+        }
+
+        function deleteSaleMobile(id) {
+            if (!confirm('Voulez-vous vraiment supprimer cette vente ?')) return;
+            
+            const index = salesHistory.findIndex(s => s.id === id);
+            if (index === -1) return;
+            
+            salesHistory.splice(index, 1);
+            saveData();
+            updateStatsMobile();
+            renderHistoryMobile();
+            renderCreditsMobile();
+            alert('✅ Vente supprimée !');
+        }
+
+        // Credits
+        function renderCreditsMobile(filtered = null) {
+            const container = document.getElementById('creditsListMobile');
+            const allSales = filtered || salesHistory;
+            const unpaid = allSales.filter(s => s.amountOwed > 0);
+
+            if (unpaid.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">Aucun credit</div>';
+                return;
+            }
+
+            container.innerHTML = unpaid.map(s => {
+                const date = new Date(s.date);
+                const badge = s.paymentMethod === 'credit' 
+                    ? '<span class="badge-compact badge-danger">CREDIT</span>'
+                    : '<span class="badge-compact badge-warning">AVANCE</span>';
+
+                return `
+                    <div class="list-item-compact">
+                        <div class="list-item-header">
+                            <div>
+                                <div class="list-item-name">${s.clientName}</div>
+                                <div class="list-item-details">${date.toLocaleDateString('fr-FR')}</div>
+                            </div>
+                            <div class="list-item-amount" style="color:#ef4444;">${formatMoney(s.amountOwed)}</div>
+                        </div>
+                        <div class="list-item-details">Total: ${formatMoney(s.total)} • Paye: ${formatMoney(s.amountPaid || 0)}</div>
+                        <div style="margin-top:6px;">${badge}</div>
+                        <div class="list-item-actions">
+                            <button class="btn-compact btn-success-compact btn-small-compact" onclick="recordPaymentMobile(${s.id})">Payer</button>
+                            <button class="btn-compact btn-primary-compact btn-small-compact" onclick="editSaleMobile(${s.id})" style="background:#f59e0b;">Éditer</button>
+                            <button class="btn-compact btn-danger-compact btn-small-compact" onclick="deleteSaleMobile(${s.id})">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function searchCreditsMobile() {
+            const term = document.getElementById('searchCreditsMobile').value.toLowerCase();
+            if (!term) {
+                renderCreditsMobile();
+                return;
+            }
+            const filtered = salesHistory.filter(s => 
+                s.amountOwed > 0 && (s.clientName.toLowerCase().includes(term) || s.clientPhone.includes(term))
+            );
+            renderCreditsMobile(filtered);
+        }
+
+        function recordPaymentMobile(id) {
+            const sale = salesHistory.find(s => s.id === id);
+            if (!sale) return;
+
+            const amount = parseFloat(prompt(`Reste: ${formatMoney(sale.amountOwed)}\n\nMontant du paiement:`, sale.amountOwed));
+            if (!amount || amount <= 0 || amount > sale.amountOwed) {
+                alert('Montant invalide !');
+                return;
+            }
+
+            sale.amountPaid += amount;
+            sale.amountOwed -= amount;
+
+            if (sale.amountOwed <= 0) {
+                sale.paymentMethod = 'cash';
+                sale.amountOwed = 0;
+            }
+
+            saveData();
+            updateStatsMobile();
+            renderCreditsMobile();
+            alert('Paiement enregistre !');
+        }
+
+        // Rapports
+        function generateReportMobile() {
+            const period = document.getElementById('periodMobile').value;
+            const reportDate = new Date(document.getElementById('reportDateMobile').value || new Date());
+            const container = document.getElementById('reportContentMobile');
+
+            let filtered = [];
+            let label = '';
+
+            if (period === 'day') {
+                const dateStr = reportDate.toDateString();
+                filtered = salesHistory.filter(s => new Date(s.date).toDateString() === dateStr);
+                label = reportDate.toLocaleDateString('fr-FR');
+            } else if (period === 'week') {
+                const weekStart = new Date(reportDate);
+                weekStart.setDate(reportDate.getDate() - reportDate.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                filtered = salesHistory.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= weekStart && d <= weekEnd;
+                });
+                label = `${weekStart.toLocaleDateString('fr-FR')} - ${weekEnd.toLocaleDateString('fr-FR')}`;
+            } else {
+                const monthStart = new Date(reportDate.getFullYear(), reportDate.getMonth(), 1);
+                const monthEnd = new Date(reportDate.getFullYear(), reportDate.getMonth() + 1, 0, 23, 59, 59, 999);
+                filtered = salesHistory.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= monthStart && d <= monthEnd;
+                });
+                label = reportDate.toLocaleDateString('fr-FR', {year: 'numeric', month: 'long'});
+            }
+
+            const total = filtered.reduce((sum, s) => sum + s.total, 0);
+            const paid = filtered.reduce((sum, s) => sum + (s.amountPaid || s.total), 0);
+            const owed = filtered.reduce((sum, s) => sum + (s.amountOwed || 0), 0);
+
+            const productStats = {};
+            filtered.forEach(sale => {
+                sale.products.forEach(p => {
+                    if (!productStats[p.name]) {
+                        productStats[p.name] = { qty: 0, revenue: 0 };
+                    }
+                    productStats[p.name].qty += p.quantity;
+                    productStats[p.name].revenue += p.total;
+                });
+            });
+
+            const products = Object.entries(productStats).sort((a, b) => b[1].revenue - a[1].revenue);
+
+            // Stocker pour la recherche
+            currentReportData = filtered;
+
+            container.innerHTML = `
+                <div class="section">
+                    <div style="text-align:center;margin-bottom:16px;">
+                        <div style="font-size:12px;color:#666;margin-bottom:4px;">Periode</div>
+                        <div style="font-size:14px;font-weight:600;">${label}</div>
+                    </div>
+
+                    <div class="stats-compact" style="grid-template-columns:1fr;">
+                        <div class="stat-card-compact">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:12px;color:#666;">Ventes</span>
+                                <span style="font-size:20px;font-weight:700;">${filtered.length}</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-compact">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:12px;color:#666;">CA Total</span>
+                                <span style="font-size:18px;font-weight:700;color:#10b981;">${formatMoney(total)}</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-compact">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:12px;color:#666;">Encaisse</span>
+                                <span style="font-size:18px;font-weight:700;color:#10b981;">${formatMoney(paid)}</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-compact">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:12px;color:#666;">A encaisser</span>
+                                <span style="font-size:18px;font-weight:700;color:#ef4444;">${formatMoney(owed)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${products.length > 0 ? `
+                        <div style="margin-top:20px;">
+                            <div class="section-title">Produits vendus</div>
+                            ${products.map(([name, stats]) => `
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                                    <div>
+                                        <div style="font-size:13px;font-weight:600;">${name}</div>
+                                        <div style="font-size:11px;color:#666;">${stats.qty} vendus</div>
+                                    </div>
+                                    <div style="font-size:14px;font-weight:700;color:#10b981;">${formatMoney(stats.revenue)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <div style="margin-top:20px;">
+                        <div class="section-title">Détails des ventes</div>
+                        
+                        <div class="search-box" style="margin-bottom:12px;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchReportDetailMobile" placeholder="Rechercher client ou article..." onkeyup="searchReportDetailMobile()" style="width:100%;padding:12px 12px 12px 40px;border:2px solid var(--bg-card);border-radius:10px;background:var(--bg-input);color:var(--text-primary);">
+                        </div>
+                        
+                        <div style="overflow-x:auto;" id="reportDetailTableContainer">
+                            <table style="width:100%;font-size:11px;border-collapse:collapse;" id="reportDetailTable">
+                                <thead>
+                                    <tr style="background:#2563eb;color:white;">
+                                        <th style="padding:8px;text-align:left;">Date</th>
+                                        <th style="padding:8px;text-align:left;">Client</th>
+                                        <th style="padding:8px;text-align:left;">Article</th>
+                                        <th style="padding:8px;text-align:center;">Qté</th>
+                                        <th style="padding:8px;text-align:right;">Prix U</th>
+                                        <th style="padding:8px;text-align:right;">Total</th>
+                                        <th style="padding:8px;text-align:right;">Comptant</th>
+                                        <th style="padding:8px;text-align:right;">Crédit</th>
+                                        <th style="padding:8px;text-align:right;">Avance</th>
+                                        <th style="padding:8px;text-align:right;">Reste</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filtered.map((sale, saleIndex) => {
+                                        const date = new Date(sale.date);
+                                        const dateStr = date.toLocaleDateString('fr-FR');
+                                        const bgColor = saleIndex % 2 === 0 ? '#e0f2fe' : '#f0f9ff';
+                                        
+                                        return sale.products.map((product, pIndex) => {
+                                            const comptant = sale.paymentMethod === 'cash' ? (pIndex === 0 ? sale.total : 0) : 0;
+                                            const credit = sale.paymentMethod === 'credit' ? (pIndex === 0 ? sale.total : 0) : 0;
+                                            const avance = sale.paymentMethod === 'partial' ? (pIndex === 0 ? (sale.amountPaid || 0) : 0) : 0;
+                                            const reste = pIndex === 0 ? (sale.amountOwed || 0) : 0;
+                                            
+                                            return `
+                                                <tr style="border-bottom:1px solid #cbd5e1;background:${bgColor};">
+                                                    <td style="padding:8px;font-weight:${pIndex === 0 ? '700' : 'normal'};color:#1e293b;font-size:${pIndex === 0 ? '12px' : '11px'};">${pIndex === 0 ? dateStr : ''}</td>
+                                                    <td style="padding:8px;font-weight:${pIndex === 0 ? '700' : 'normal'};color:#0f172a;font-size:${pIndex === 0 ? '12px' : '11px'};">${pIndex === 0 ? sale.clientName : ''}</td>
+                                                    <td style="padding:8px;color:#334155;">${product.name}</td>
+                                                    <td style="padding:8px;text-align:center;color:#334155;">${product.quantity}</td>
+                                                    <td style="padding:8px;text-align:right;color:#334155;">${Math.round(product.price).toLocaleString('fr-FR')}</td>
+                                                    <td style="padding:8px;text-align:right;font-weight:600;color:#1e293b;">${Math.round(product.total).toLocaleString('fr-FR')}</td>
+                                                    <td style="padding:8px;text-align:right;color:${comptant > 0 ? '#059669' : '#94a3b8'};font-weight:${comptant > 0 ? '700' : 'normal'};">${comptant > 0 ? Math.round(comptant).toLocaleString('fr-FR') : '0'}</td>
+                                                    <td style="padding:8px;text-align:right;color:${credit > 0 ? '#dc2626' : '#94a3b8'};font-weight:${credit > 0 ? '700' : 'normal'};">${credit > 0 ? Math.round(credit).toLocaleString('fr-FR') : '0'}</td>
+                                                    <td style="padding:8px;text-align:right;color:${avance > 0 ? '#d97706' : '#94a3b8'};font-weight:${avance > 0 ? '700' : 'normal'};">${avance > 0 ? Math.round(avance).toLocaleString('fr-FR') : '0'}</td>
+                                                    <td style="padding:8px;text-align:right;color:${reste > 0 ? '#dc2626' : '#94a3b8'};font-weight:${reste > 0 ? '700' : 'normal'};">${reste > 0 ? Math.round(reste).toLocaleString('fr-FR') : '0'}</td>
+                                                </tr>
+                                            `;
+                                        }).join('');
+                                    }).join('')}
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background:#1e293b;font-weight:700;color:white;">
+                                        <td colspan="5" style="padding:10px;text-align:right;color:white;">TOTAL</td>
+                                        <td style="padding:10px;text-align:right;color:white;">${Math.round(total).toLocaleString('fr-FR')}</td>
+                                        <td style="padding:10px;text-align:right;color:white;">${Math.round(filtered.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                                        <td style="padding:10px;text-align:right;color:#ff6b6b;font-weight:bold;">${Math.round(filtered.filter(s => s.paymentMethod === 'credit').reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                                        <td style="padding:10px;text-align:right;color:white;">${Math.round(filtered.filter(s => s.paymentMethod === 'partial').reduce((sum, s) => sum + (s.amountPaid || 0), 0)).toLocaleString('fr-FR')}</td>
+                                        <td style="padding:10px;text-align:right;color:#ff6b6b;font-weight:bold;">${Math.round(owed).toLocaleString('fr-FR')}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Recherche dans le tableau détaillé du rapport
+        function searchReportDetailMobile() {
+            const term = document.getElementById('searchReportDetailMobile').value.toLowerCase();
+            const tbody = document.querySelector('#reportDetailTable tbody');
+            
+            if (!tbody || !currentReportData || currentReportData.length === 0) return;
+            
+            if (!term) {
+                // Réafficher tout
+                generateReportMobile();
+                return;
+            }
+            
+            // Filtrer les ventes
+            const filtered = currentReportData.filter(sale => 
+                sale.clientName.toLowerCase().includes(term) ||
+                sale.products.some(p => p.name.toLowerCase().includes(term))
+            );
+            
+            // Reconstruire le tableau avec les résultats filtrés
+            const total = filtered.reduce((sum, s) => sum + s.total, 0);
+            const owed = filtered.reduce((sum, s) => sum + (s.amountOwed || 0), 0);
+            const comptantTotal = filtered.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0);
+            const creditTotal = filtered.filter(s => s.paymentMethod === 'credit').reduce((sum, s) => sum + s.total, 0);
+            const avanceTotal = filtered.filter(s => s.paymentMethod === 'partial').reduce((sum, s) => sum + (s.amountPaid || 0), 0);
+            
+            tbody.innerHTML = filtered.map((sale, saleIndex) => {
+                const date = new Date(sale.date);
+                const dateStr = date.toLocaleDateString('fr-FR');
+                const bgColor = saleIndex % 2 === 0 ? '#e0f2fe' : '#f0f9ff';
+                
+                return sale.products.map((product, pIndex) => {
+                    const comptant = sale.paymentMethod === 'cash' ? (pIndex === 0 ? sale.total : 0) : 0;
+                    const credit = sale.paymentMethod === 'credit' ? (pIndex === 0 ? sale.total : 0) : 0;
+                    const avance = sale.paymentMethod === 'partial' ? (pIndex === 0 ? (sale.amountPaid || 0) : 0) : 0;
+                    const reste = pIndex === 0 ? (sale.amountOwed || 0) : 0;
+                    
+                    return `
+                        <tr style="border-bottom:1px solid #cbd5e1;background:${bgColor};">
+                            <td style="padding:8px;font-weight:${pIndex === 0 ? '700' : 'normal'};color:#1e293b;font-size:${pIndex === 0 ? '12px' : '11px'};">${pIndex === 0 ? dateStr : ''}</td>
+                            <td style="padding:8px;font-weight:${pIndex === 0 ? '700' : 'normal'};color:#0f172a;font-size:${pIndex === 0 ? '12px' : '11px'};">${pIndex === 0 ? sale.clientName : ''}</td>
+                            <td style="padding:8px;color:#334155;">${product.name}</td>
+                            <td style="padding:8px;text-align:center;color:#334155;">${product.quantity}</td>
+                            <td style="padding:8px;text-align:right;color:#334155;">${Math.round(product.price).toLocaleString('fr-FR')}</td>
+                            <td style="padding:8px;text-align:right;font-weight:600;color:#1e293b;">${Math.round(product.total).toLocaleString('fr-FR')}</td>
+                            <td style="padding:8px;text-align:right;color:${comptant > 0 ? '#059669' : '#94a3b8'};font-weight:${comptant > 0 ? '700' : 'normal'};">${comptant > 0 ? Math.round(comptant).toLocaleString('fr-FR') : '0'}</td>
+                            <td style="padding:8px;text-align:right;color:${credit > 0 ? '#dc2626' : '#94a3b8'};font-weight:${credit > 0 ? '700' : 'normal'};">${credit > 0 ? Math.round(credit).toLocaleString('fr-FR') : '0'}</td>
+                            <td style="padding:8px;text-align:right;color:${avance > 0 ? '#d97706' : '#94a3b8'};font-weight:${avance > 0 ? '700' : 'normal'};">${avance > 0 ? Math.round(avance).toLocaleString('fr-FR') : '0'}</td>
+                            <td style="padding:8px;text-align:right;color:${reste > 0 ? '#dc2626' : '#94a3b8'};font-weight:${reste > 0 ? '700' : 'normal'};">${reste > 0 ? Math.round(reste).toLocaleString('fr-FR') : '0'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }).join('');
+            
+            // Mettre à jour le total
+            const tfoot = document.querySelector('#reportDetailTable tfoot');
+            if (tfoot) {
+                tfoot.innerHTML = `
+                    <tr style="background:#1e293b;font-weight:700;color:white;">
+                        <td colspan="5" style="padding:10px;text-align:right;color:white;">TOTAL (${filtered.length} ventes)</td>
+                        <td style="padding:10px;text-align:right;color:white;">${Math.round(total).toLocaleString('fr-FR')}</td>
+                        <td style="padding:10px;text-align:right;color:white;">${Math.round(comptantTotal).toLocaleString('fr-FR')}</td>
+                        <td style="padding:10px;text-align:right;color:#ff6b6b;font-weight:bold;">${Math.round(creditTotal).toLocaleString('fr-FR')}</td>
+                        <td style="padding:10px;text-align:right;color:white;">${Math.round(avanceTotal).toLocaleString('fr-FR')}</td>
+                        <td style="padding:10px;text-align:right;color:#ff6b6b;font-weight:bold;">${Math.round(owed).toLocaleString('fr-FR')}</td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Exporter le rapport en Excel avec mise en forme professionnelle
+        function exportReportExcelMobile() {
+            const period = document.getElementById('periodMobile').value;
+            const reportDate = new Date(document.getElementById('reportDateMobile').value || new Date());
+            
+            let filtered = [];
+            let label = '';
+
+            if (period === 'day') {
+                const dateStr = reportDate.toDateString();
+                filtered = salesHistory.filter(s => new Date(s.date).toDateString() === dateStr);
+                label = reportDate.toLocaleDateString('fr-FR');
+            } else if (period === 'week') {
+                const weekStart = new Date(reportDate);
+                weekStart.setDate(reportDate.getDate() - reportDate.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                filtered = salesHistory.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= weekStart && d <= weekEnd;
+                });
+                label = `${weekStart.toLocaleDateString('fr-FR')} - ${weekEnd.toLocaleDateString('fr-FR')}`;
+            } else {
+                const monthStart = new Date(reportDate.getFullYear(), reportDate.getMonth(), 1);
+                const monthEnd = new Date(reportDate.getFullYear(), reportDate.getMonth() + 1, 0, 23, 59, 59, 999);
+                filtered = salesHistory.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= monthStart && d <= monthEnd;
+                });
+                label = reportDate.toLocaleDateString('fr-FR', {year: 'numeric', month: 'long'});
+            }
+
+            const total = filtered.reduce((sum, s) => sum + s.total, 0);
+            const paid = filtered.reduce((sum, s) => sum + (s.amountPaid || s.total), 0);
+            const owed = filtered.reduce((sum, s) => sum + (s.amountOwed || 0), 0);
+
+            const productStats = {};
+            filtered.forEach(sale => {
+                sale.products.forEach(p => {
+                    if (!productStats[p.name]) {
+                        productStats[p.name] = { qty: 0, revenue: 0 };
+                    }
+                    productStats[p.name].qty += p.quantity;
+                    productStats[p.name].revenue += p.total;
+                });
+            });
+
+            const products = Object.entries(productStats).sort((a, b) => b[1].revenue - a[1].revenue);
+            
+            // Créer le fichier Excel
+            let html = `
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        table { border-collapse: collapse; width: 100%; }
+                        .header { background-color: #2563eb; color: white; text-align: center; padding: 15px; font-size: 18px; font-weight: bold; }
+                        .subheader { background-color: #f0f0f0; padding: 10px; margin: 10px 0; }
+                        .info-row { padding: 5px; }
+                        .label { font-weight: bold; color: #333; }
+                        .value { color: #666; }
+                        .section-title { background-color: #2563eb; color: white; padding: 10px; font-weight: bold; margin-top: 20px; }
+                        th { background-color: #3b82f6; color: white; padding: 10px; text-align: left; border: 1px solid #2563eb; font-weight: bold; }
+                        td { padding: 8px; border: 1px solid #ddd; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .total-row { background-color: #dbeafe; font-weight: bold; }
+                        .money { text-align: right; }
+                        .number { text-align: center; }
+                        .success { color: #10b981; font-weight: bold; }
+                        .danger { color: #ef4444; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">RAPPORT DE VENTES - ${shopConfig.name}</div>
+                    
+                    <div class="subheader">
+                        <div class="info-row"><span class="label">Adresse:</span> <span class="value">${shopConfig.address}</span></div>
+                        <div class="info-row"><span class="label">Telephone:</span> <span class="value">${shopConfig.phone}</span></div>
+                        <div class="info-row"><span class="label">Periode:</span> <span class="value">${period === 'day' ? 'Journalier' : period === 'week' ? 'Hebdomadaire' : 'Mensuel'} - ${label}</span></div>
+                        <div class="info-row"><span class="label">Date de generation:</span> <span class="value">${new Date().toLocaleDateString('fr-FR')} ${new Date().toLocaleTimeString('fr-FR')}</span></div>
+                    </div>
+
+                    <div class="section-title">RESUME FINANCIER</div>
+                    <table>
+                        <tr>
+                            <th>Nombre de ventes</th>
+                            <th>Chiffre d'affaires total</th>
+                            <th>Montant encaisse</th>
+                            <th>Reste a encaisser</th>
+                        </tr>
+                        <tr>
+                            <td class="number">${filtered.length}</td>
+                            <td class="money">${Math.round(total).toLocaleString('fr-FR')} FCFA</td>
+                            <td class="money success">${Math.round(paid).toLocaleString('fr-FR')} FCFA</td>
+                            <td class="money danger">${Math.round(owed).toLocaleString('fr-FR')} FCFA</td>
+                        </tr>
+                    </table>
+
+                    ${products.length > 0 ? `
+                        <div class="section-title">DETAILS DES PRODUITS VENDUS</div>
+                        <table>
+                            <tr>
+                                <th>#</th>
+                                <th>Produit</th>
+                                <th>Quantite vendue</th>
+                                <th>Revenu total</th>
+                            </tr>
+                            ${products.map(([name, stats], index) => `
+                                <tr>
+                                    <td class="number">${index + 1}</td>
+                                    <td>${name}</td>
+                                    <td class="number">${stats.qty}</td>
+                                    <td class="money success">${Math.round(stats.revenue).toLocaleString('fr-FR')} FCFA</td>
+                                </tr>
+                            `).join('')}
+                            <tr class="total-row">
+                                <td colspan="2">TOTAL</td>
+                                <td class="number">${products.reduce((sum, [, stats]) => sum + stats.qty, 0)}</td>
+                                <td class="money">${Math.round(total).toLocaleString('fr-FR')} FCFA</td>
+                            </tr>
+                        </table>
+                    ` : '<p style="text-align: center; padding: 20px; color: #999;">Aucun produit vendu</p>'}
+
+                    <div class="section-title">DETAILS DES VENTES (PERIODE)</div>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nom du client</th>
+                            <th>Article</th>
+                            <th>Qté</th>
+                            <th>Prix U</th>
+                            <th>Total</th>
+                            <th>Comptant</th>
+                            <th>Crédit</th>
+                            <th>Avance</th>
+                            <th>Reste</th>
+                        </tr>
+                        ${filtered.map(sale => {
+                            const date = new Date(sale.date);
+                            const dateStr = date.toLocaleDateString('fr-FR');
+                            
+                            // Une ligne par produit
+                            return sale.products.map((product, pIndex) => {
+                                const comptant = sale.paymentMethod === 'cash' ? (pIndex === 0 ? sale.total : 0) : 0;
+                                const credit = sale.paymentMethod === 'credit' ? (pIndex === 0 ? sale.total : 0) : 0;
+                                const avance = sale.paymentMethod === 'partial' ? (pIndex === 0 ? (sale.amountPaid || 0) : 0) : 0;
+                                const reste = pIndex === 0 ? (sale.amountOwed || 0) : 0;
+                                
+                                return `
+                                    <tr>
+                                        <td>${pIndex === 0 ? dateStr : ''}</td>
+                                        <td>${pIndex === 0 ? sale.clientName : ''}</td>
+                                        <td>${product.name}</td>
+                                        <td class="number">${product.quantity}</td>
+                                        <td class="money">${Math.round(product.price).toLocaleString('fr-FR')}</td>
+                                        <td class="money">${Math.round(product.total).toLocaleString('fr-FR')}</td>
+                                        <td class="money ${comptant > 0 ? 'success' : ''}">${comptant > 0 ? Math.round(comptant).toLocaleString('fr-FR') : '0'}</td>
+                                        <td class="money ${credit > 0 ? 'danger' : ''}">${credit > 0 ? Math.round(credit).toLocaleString('fr-FR') : '0'}</td>
+                                        <td class="money" style="${avance > 0 ? 'color:#f59e0b;font-weight:bold;' : ''}">${avance > 0 ? Math.round(avance).toLocaleString('fr-FR') : '0'}</td>
+                                        <td class="money ${reste > 0 ? 'danger' : ''}">${reste > 0 ? Math.round(reste).toLocaleString('fr-FR') : '0'}</td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        }).join('')}
+                        <tr class="total-row" style="background:#1e293b;color:white;">
+                            <td colspan="5" style="text-align:right;font-weight:bold;padding:10px;">TOTAL GENERAL</td>
+                            <td class="money" style="font-weight:bold;padding:10px;">${Math.round(total).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;">${Math.round(filtered.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;color:#ff6b6b;">${Math.round(filtered.filter(s => s.paymentMethod === 'credit').reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;">${Math.round(filtered.filter(s => s.paymentMethod === 'partial').reduce((sum, s) => sum + (s.amountPaid || 0), 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;color:#ff6b6b;">${Math.round(owed).toLocaleString('fr-FR')}</td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">HISTORIQUE COMPLET DES VENTES</div>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Nom du client</th>
+                            <th>Article</th>
+                            <th>Qté</th>
+                            <th>Prix U</th>
+                            <th>Total</th>
+                            <th>Comptant</th>
+                            <th>Crédit</th>
+                            <th>Avance</th>
+                            <th>Reste</th>
+                        </tr>
+                        ${salesHistory.map(sale => {
+                            const date = new Date(sale.date);
+                            const dateStr = date.toLocaleDateString('fr-FR');
+                            
+                            return sale.products.map((product, pIndex) => {
+                                const comptant = sale.paymentMethod === 'cash' ? (pIndex === 0 ? sale.total : 0) : 0;
+                                const credit = sale.paymentMethod === 'credit' ? (pIndex === 0 ? sale.total : 0) : 0;
+                                const avance = sale.paymentMethod === 'partial' ? (pIndex === 0 ? (sale.amountPaid || 0) : 0) : 0;
+                                const reste = pIndex === 0 ? (sale.amountOwed || 0) : 0;
+                                
+                                return `
+                                    <tr>
+                                        <td>${pIndex === 0 ? dateStr : ''}</td>
+                                        <td>${pIndex === 0 ? sale.clientName : ''}</td>
+                                        <td>${product.name}</td>
+                                        <td class="number">${product.quantity}</td>
+                                        <td class="money">${Math.round(product.price).toLocaleString('fr-FR')}</td>
+                                        <td class="money">${Math.round(product.total).toLocaleString('fr-FR')}</td>
+                                        <td class="money ${comptant > 0 ? 'success' : ''}">${comptant > 0 ? Math.round(comptant).toLocaleString('fr-FR') : '0'}</td>
+                                        <td class="money ${credit > 0 ? 'danger' : ''}">${credit > 0 ? Math.round(credit).toLocaleString('fr-FR') : '0'}</td>
+                                        <td class="money" style="${avance > 0 ? 'color:#f59e0b;font-weight:bold;' : ''}">${avance > 0 ? Math.round(avance).toLocaleString('fr-FR') : '0'}</td>
+                                        <td class="money ${reste > 0 ? 'danger' : ''}">${reste > 0 ? Math.round(reste).toLocaleString('fr-FR') : '0'}</td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        }).join('')}
+                        <tr class="total-row" style="background:#1e293b;color:white;">
+                            <td colspan="5" style="text-align:right;font-weight:bold;padding:10px;">TOTAL HISTORIQUE</td>
+                            <td class="money" style="font-weight:bold;padding:10px;">${Math.round(salesHistory.reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;">${Math.round(salesHistory.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;color:#ff6b6b;">${Math.round(salesHistory.filter(s => s.paymentMethod === 'credit').reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;">${Math.round(salesHistory.filter(s => s.paymentMethod === 'partial').reduce((sum, s) => sum + (s.amountPaid || 0), 0)).toLocaleString('fr-FR')}</td>
+                            <td class="money" style="font-weight:bold;padding:10px;color:#ff6b6b;">${Math.round(salesHistory.reduce((sum, s) => sum + (s.amountOwed || 0), 0)).toLocaleString('fr-FR')}</td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">HISTORIQUE COMPLET DES VENTES</div>
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Téléphone</th>
+                            <th>Articles</th>
+                            <th>Mode</th>
+                            <th>Total</th>
+                            <th>Payé</th>
+                            <th>Reste</th>
+                        </tr>
+                        ${salesHistory.map((sale, index) => {
+                            const date = new Date(sale.date);
+                            const articles = sale.products.map(p => `${p.name} (${p.quantity})`).join(', ');
+                            const mode = sale.paymentMethod === 'cash' ? 'Comptant' : sale.paymentMethod === 'credit' ? 'Crédit' : 'Avance';
+                            return `
+                                <tr>
+                                    <td class="number">${index + 1}</td>
+                                    <td>${date.toLocaleDateString('fr-FR')} ${date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}</td>
+                                    <td>${sale.clientName}</td>
+                                    <td>${sale.clientPhone}</td>
+                                    <td>${articles}</td>
+                                    <td>${mode}</td>
+                                    <td class="money">${Math.round(sale.total).toLocaleString('fr-FR')} FCFA</td>
+                                    <td class="money success">${Math.round(sale.amountPaid || sale.total).toLocaleString('fr-FR')} FCFA</td>
+                                    <td class="money ${sale.amountOwed > 0 ? 'danger' : ''}">${Math.round(sale.amountOwed || 0).toLocaleString('fr-FR')} FCFA</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                        <tr class="total-row">
+                            <td colspan="6">TOTAL HISTORIQUE</td>
+                            <td class="money">${Math.round(salesHistory.reduce((sum, s) => sum + s.total, 0)).toLocaleString('fr-FR')} FCFA</td>
+                            <td class="money">${Math.round(salesHistory.reduce((sum, s) => sum + (s.amountPaid || s.total), 0)).toLocaleString('fr-FR')} FCFA</td>
+                            <td class="money">${Math.round(salesHistory.reduce((sum, s) => sum + (s.amountOwed || 0), 0)).toLocaleString('fr-FR')} FCFA</td>
+                        </tr>
+                    </table>
+
+                    ${salesHistory.filter(s => s.amountOwed > 0).length > 0 ? `
+                        <div class="section-title">CRÉDITS-AVANCES EN COURS</div>
+                        <table>
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Client</th>
+                                <th>Téléphone</th>
+                                <th>Type</th>
+                                <th>Total</th>
+                                <th>Payé</th>
+                                <th>Reste à payer</th>
+                            </tr>
+                            ${salesHistory.filter(s => s.amountOwed > 0).map((sale, index) => {
+                                const date = new Date(sale.date);
+                                const type = sale.paymentMethod === 'credit' ? 'CRÉDIT' : 'AVANCE';
+                                return `
+                                    <tr>
+                                        <td class="number">${index + 1}</td>
+                                        <td>${date.toLocaleDateString('fr-FR')}</td>
+                                        <td>${sale.clientName}</td>
+                                        <td>${sale.clientPhone}</td>
+                                        <td>${type}</td>
+                                        <td class="money">${Math.round(sale.total).toLocaleString('fr-FR')} FCFA</td>
+                                        <td class="money success">${Math.round(sale.amountPaid || 0).toLocaleString('fr-FR')} FCFA</td>
+                                        <td class="money danger">${Math.round(sale.amountOwed).toLocaleString('fr-FR')} FCFA</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                            <tr class="total-row">
+                                <td colspan="7">TOTAL IMPAYÉS</td>
+                                <td class="money danger">${Math.round(salesHistory.filter(s => s.amountOwed > 0).reduce((sum, s) => sum + s.amountOwed, 0)).toLocaleString('fr-FR')} FCFA</td>
+                            </tr>
+                        </table>
+                    ` : ''}
+                </body>
+                </html>
+            `;
+
+            // Créer le blob et télécharger
+            const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const periodText = period === 'day' ? 'Journalier' : period === 'week' ? 'Hebdomadaire' : 'Mensuel';
+            a.download = `Rapport_${periodText}_${reportDate.toLocaleDateString('fr-FR').replace(/\//g, '-')}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('Rapport Excel telecharge avec succes !');
+        }
+
+        async function exportReportPDFMobile() {
+            const period = document.getElementById('periodMobile').value;
+            const reportDate = new Date(document.getElementById('reportDateMobile').value || new Date());
+            const doc = new jsPDF('landscape'); // Mode paysage pour plus de colonnes
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            let yPos = 20;
+
+            function formatMoneyPDF(amount) {
+                return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            }
+
+            // Header
+            doc.setFillColor(37, 99, 235);
+            doc.rect(0, 0, pageWidth, 35, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('RAPPORT DE VENTES', pageWidth / 2, 12, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(shopConfig.name, pageWidth / 2, 20, { align: 'center' });
+            doc.setFontSize(8);
+            doc.text(`${shopConfig.address} - ${shopConfig.phone}`, pageWidth / 2, 27, { align: 'center' });
+
+            doc.setTextColor(0, 0, 0);
+            yPos = 45;
+
+            // Period
+            let filtered = [];
+            let label = '';
+
+            if (period === 'day') {
+                const dateStr = reportDate.toDateString();
+                filtered = salesHistory.filter(s => new Date(s.date).toDateString() === dateStr);
+                label = `Journalier - ${reportDate.toLocaleDateString('fr-FR')}`;
+            } else if (period === 'week') {
+                const weekStart = new Date(reportDate);
+                weekStart.setDate(reportDate.getDate() - reportDate.getDay());
+                weekStart.setHours(0, 0, 0, 0);
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                weekEnd.setHours(23, 59, 59, 999);
+                filtered = salesHistory.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= weekStart && d <= weekEnd;
+                });
+                label = `Semaine du ${weekStart.toLocaleDateString('fr-FR')} au ${weekEnd.toLocaleDateString('fr-FR')}`;
+            } else {
+                const monthStart = new Date(reportDate.getFullYear(), reportDate.getMonth(), 1);
+                const monthEnd = new Date(reportDate.getFullYear(), reportDate.getMonth() + 1, 0, 23, 59, 59, 999);
+                filtered = salesHistory.filter(s => {
+                    const d = new Date(s.date);
+                    return d >= monthStart && d <= monthEnd;
+                });
+                label = reportDate.toLocaleDateString('fr-FR', {year: 'numeric', month: 'long'});
+            }
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'bold');
+            doc.text(`Période: ${label}`, pageWidth / 2, yPos, { align: 'center' });
+            yPos += 10;
+
+            // Stats resumées
+            const total = filtered.reduce((sum, s) => sum + s.total, 0);
+            const paid = filtered.reduce((sum, s) => sum + (s.amountPaid || s.total), 0);
+            const owed = filtered.reduce((sum, s) => sum + (s.amountOwed || 0), 0);
+            const comptantTotal = filtered.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0);
+            const creditTotal = filtered.filter(s => s.paymentMethod === 'credit').reduce((sum, s) => sum + s.total, 0);
+            const avanceTotal = filtered.filter(s => s.paymentMethod === 'partial').reduce((sum, s) => sum + s.total, 0);
+
+            doc.setFillColor(240, 240, 240);
+            doc.roundedRect(15, yPos, pageWidth - 30, 25, 3, 3, 'F');
+            yPos += 7;
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'bold');
+            doc.text('RESUME:', 20, yPos);
+            yPos += 6;
+            doc.setFont(undefined, 'normal');
+            doc.text(`Ventes: ${filtered.length}`, 20, yPos);
+            doc.text(`Total: ${formatMoneyPDF(total)} FCFA`, 70, yPos);
+            doc.text(`Comptant: ${formatMoneyPDF(comptantTotal)} FCFA`, 140, yPos);
+            doc.text(`Crédit: ${formatMoneyPDF(creditTotal)} FCFA`, 200, yPos);
+            yPos += 6;
+            doc.text(`Avance: ${formatMoneyPDF(avanceTotal)} FCFA`, 140, yPos);
+            doc.text(`Reste: ${formatMoneyPDF(owed)} FCFA`, 200, yPos);
+            
+            yPos += 15;
+
+            // TABLEAU DÉTAILLÉ - PERIODE
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('DETAILS DES VENTES (PERIODE)', 20, yPos);
+            yPos += 7;
+
+            // En-têtes du tableau
+            doc.setFillColor(37, 99, 235);
+            doc.setTextColor(255, 255, 255);
+            doc.rect(15, yPos - 5, pageWidth - 30, 7, 'F');
+            doc.setFontSize(7);
+            doc.setFont(undefined, 'bold');
+            
+            const cols = [20, 42, 77, 110, 130, 150, 170, 195, 220, 245, 270];
+            doc.text('Date', cols[0], yPos);
+            doc.text('Client', cols[1], yPos);
+            doc.text('Article', cols[2], yPos);
+            doc.text('Qté', cols[3], yPos);
+            doc.text('Prix U', cols[4], yPos);
+            doc.text('Total', cols[5], yPos);
+            doc.text('Comptant', cols[6], yPos);
+            doc.text('Crédit', cols[7], yPos);
+            doc.text('Avance', cols[8], yPos);
+            doc.text('Reste', cols[9], yPos);
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'normal');
+            yPos += 7;
+
+            // Données
+            filtered.forEach((sale, saleIndex) => {
+                const date = new Date(sale.date).toLocaleDateString('fr-FR');
+                
+                sale.products.forEach((product, pIndex) => {
+                    if (yPos > pageHeight - 20) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    const comptant = sale.paymentMethod === 'cash' ? (pIndex === 0 ? sale.total : 0) : 0;
+                    const credit = sale.paymentMethod === 'credit' ? (pIndex === 0 ? sale.total : 0) : 0;
+                    const avance = sale.paymentMethod === 'partial' ? (pIndex === 0 ? (sale.amountPaid || 0) : 0) : 0;
+                    const reste = pIndex === 0 ? (sale.amountOwed || 0) : 0;
+
+                    doc.setFontSize(7);
+                    if (pIndex === 0) {
+                        doc.setFont(undefined, 'bold');
+                        doc.text(date, cols[0], yPos);
+                        doc.text(sale.clientName.substring(0, 15), cols[1], yPos);
+                        doc.setFont(undefined, 'normal');
+                    }
+                    doc.text(product.name.substring(0, 18), cols[2], yPos);
+                    doc.text(product.quantity.toString(), cols[3], yPos);
+                    doc.text(formatMoneyPDF(product.price), cols[4], yPos);
+                    doc.text(formatMoneyPDF(product.total), cols[5], yPos);
+                    if (pIndex === 0) {
+                        doc.text(comptant > 0 ? formatMoneyPDF(comptant) : '0', cols[6], yPos);
+                        doc.text(credit > 0 ? formatMoneyPDF(credit) : '0', cols[7], yPos);
+                        doc.text(avance > 0 ? formatMoneyPDF(avance) : '0', cols[8], yPos);
+                        doc.text(reste > 0 ? formatMoneyPDF(reste) : '0', cols[9], yPos);
+                    }
+
+                    yPos += 5;
+                });
+            });
+
+            // Totaux
+            yPos += 3;
+            doc.setFillColor(219, 234, 254);
+            doc.rect(15, yPos - 4, pageWidth - 30, 7, 'F');
+            doc.setFont(undefined, 'bold');
+            doc.text('TOTAL', cols[2], yPos);
+            doc.text(formatMoneyPDF(total), cols[5], yPos);
+            doc.text(formatMoneyPDF(comptantTotal), cols[6], yPos);
+            doc.text(formatMoneyPDF(creditTotal), cols[7], yPos);
+            doc.text(formatMoneyPDF(avanceTotal), cols[8], yPos);
+            doc.text(formatMoneyPDF(owed), cols[9], yPos);
+            
+            yPos += 15;
+
+            // HISTORIQUE COMPLET
+            if (yPos > pageHeight - 30) { doc.addPage(); yPos = 20; }
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('HISTORIQUE COMPLET DES VENTES', 20, yPos);
+            yPos += 7;
+
+            // En-têtes
+            doc.setFillColor(37, 99, 235);
+            doc.setTextColor(255, 255, 255);
+            doc.rect(15, yPos - 5, pageWidth - 30, 7, 'F');
+            doc.setFontSize(7);
+            doc.text('Date', cols[0], yPos);
+            doc.text('Client', cols[1], yPos);
+            doc.text('Article', cols[2], yPos);
+            doc.text('Qté', cols[3], yPos);
+            doc.text('Prix U', cols[4], yPos);
+            doc.text('Total', cols[5], yPos);
+            doc.text('Comptant', cols[6], yPos);
+            doc.text('Crédit', cols[7], yPos);
+            doc.text('Avance', cols[8], yPos);
+            doc.text('Reste', cols[9], yPos);
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFont(undefined, 'normal');
+            yPos += 7;
+
+            // Toutes les ventes
+            const totalAll = salesHistory.reduce((sum, s) => sum + s.total, 0);
+            const comptantAll = salesHistory.filter(s => s.paymentMethod === 'cash').reduce((sum, s) => sum + s.total, 0);
+            const creditAll = salesHistory.filter(s => s.paymentMethod === 'credit').reduce((sum, s) => sum + s.total, 0);
+            const avanceAll = salesHistory.filter(s => s.paymentMethod === 'partial').reduce((sum, s) => sum + s.total, 0);
+            const owedAll = salesHistory.reduce((sum, s) => sum + (s.amountOwed || 0), 0);
+
+            salesHistory.forEach(sale => {
+                const date = new Date(sale.date).toLocaleDateString('fr-FR');
+                
+                sale.products.forEach((product, pIndex) => {
+                    if (yPos > pageHeight - 20) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+
+                    const comptant = sale.paymentMethod === 'cash' ? (pIndex === 0 ? sale.total : 0) : 0;
+                    const credit = sale.paymentMethod === 'credit' ? (pIndex === 0 ? sale.total : 0) : 0;
+                    const avance = sale.paymentMethod === 'partial' ? (pIndex === 0 ? (sale.amountPaid || 0) : 0) : 0;
+                    const reste = pIndex === 0 ? (sale.amountOwed || 0) : 0;
+
+                    doc.setFontSize(7);
+                    if (pIndex === 0) {
+                        doc.setFont(undefined, 'bold');
+                        doc.text(date, cols[0], yPos);
+                        doc.text(sale.clientName.substring(0, 15), cols[1], yPos);
+                        doc.setFont(undefined, 'normal');
+                    }
+                    doc.text(product.name.substring(0, 18), cols[2], yPos);
+                    doc.text(product.quantity.toString(), cols[3], yPos);
+                    doc.text(formatMoneyPDF(product.price), cols[4], yPos);
+                    doc.text(formatMoneyPDF(product.total), cols[5], yPos);
+                    if (pIndex === 0) {
+                        doc.text(comptant > 0 ? formatMoneyPDF(comptant) : '0', cols[6], yPos);
+                        doc.text(credit > 0 ? formatMoneyPDF(credit) : '0', cols[7], yPos);
+                        doc.text(avance > 0 ? formatMoneyPDF(avance) : '0', cols[8], yPos);
+                        doc.text(reste > 0 ? formatMoneyPDF(reste) : '0', cols[9], yPos);
+                    }
+
+                    yPos += 5;
+                });
+            });
+
+            // Totaux historique
+            yPos += 3;
+            doc.setFillColor(219, 234, 254);
+            doc.rect(15, yPos - 4, pageWidth - 30, 7, 'F');
+            doc.setFont(undefined, 'bold');
+            doc.text('TOTAL HISTORIQUE', cols[1], yPos);
+            doc.text(formatMoneyPDF(totalAll), cols[5], yPos);
+            doc.text(formatMoneyPDF(comptantAll), cols[6], yPos);
+            doc.text(formatMoneyPDF(creditAll), cols[7], yPos);
+            doc.text(formatMoneyPDF(avanceAll), cols[8], yPos);
+            doc.text(formatMoneyPDF(owedAll), cols[9], yPos);
+
+            // CRÉDITS-AVANCES EN COURS
+            const unpaidSales = salesHistory.filter(s => s.amountOwed > 0);
+            if (unpaidSales.length > 0) {
+                yPos += 15;
+                if (yPos > pageHeight - 30) { doc.addPage(); yPos = 20; }
+                doc.setFontSize(11);
+                doc.text('CREDITS-AVANCES EN COURS', 20, yPos);
+                yPos += 7;
+
+                doc.setFillColor(37, 99, 235);
+                doc.setTextColor(255, 255, 255);
+                doc.rect(15, yPos - 5, pageWidth - 30, 7, 'F');
+                doc.setFontSize(7);
+                doc.text('Date', 20, yPos);
+                doc.text('Client', 50, yPos);
+                doc.text('Téléphone', 100, yPos);
+                doc.text('Type', 150, yPos);
+                doc.text('Total', 180, yPos);
+                doc.text('Payé', 210, yPos);
+                doc.text('Reste', 240, yPos);
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+                yPos += 7;
+
+                unpaidSales.forEach(sale => {
+                    if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
+                    const date = new Date(sale.date).toLocaleDateString('fr-FR');
+                    const type = sale.paymentMethod === 'credit' ? 'CRÉDIT' : 'AVANCE';
+                    
+                    doc.text(date, 20, yPos);
+                    doc.text(sale.clientName.substring(0, 20), 50, yPos);
+                    doc.text(sale.clientPhone, 100, yPos);
+                    doc.text(type, 150, yPos);
+                    doc.text(formatMoneyPDF(sale.total), 180, yPos);
+                    doc.text(formatMoneyPDF(sale.amountPaid || 0), 210, yPos);
+                    doc.text(formatMoneyPDF(sale.amountOwed), 240, yPos);
+                    yPos += 5;
+                });
+
+                yPos += 3;
+                doc.setFillColor(219, 234, 254);
+                doc.rect(15, yPos - 4, pageWidth - 30, 7, 'F');
+                doc.setFont(undefined, 'bold');
+                doc.text('TOTAL IMPAYÉS', 150, yPos);
+                const totalUnpaid = unpaidSales.reduce((sum, s) => sum + s.amountOwed, 0);
+                doc.text(formatMoneyPDF(totalUnpaid), 240, yPos);
+            }
+
+            // Footer
+            doc.setFontSize(7);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+            doc.save(`Rapport_${label.replace(/\s+/g, '_')}.pdf`);
+            alert('✅ Rapport PDF téléchargé !');
+        }
+
+        // Parametres
+        function loadParamsMobile() {
+            document.getElementById('shopNameInputMobile').value = shopConfig.name;
+            document.getElementById('shopAddressInputMobile').value = shopConfig.address;
+            document.getElementById('shopPhoneInputMobile').value = shopConfig.phone;
+            document.getElementById('shopNameDisplayParams').textContent = shopConfig.name;
+            renderCatalogMobile();
+        }
+
+        function saveConfigMobile() {
+            shopConfig.name = document.getElementById('shopNameInputMobile').value || 'Ma Boutique';
+            shopConfig.address = document.getElementById('shopAddressInputMobile').value || 'Congo';
+            shopConfig.phone = document.getElementById('shopPhoneInputMobile').value || '+242';
+            
+            updateShopDisplayMobile();
+            saveData();
+            alert('Configuration enregistree !');
+        }
+
+        function showAddProductCatalogMobile() {
+            const name = prompt('Nom du produit:');
+            if (!name) return;
+            const price = parseFloat(prompt('Prix:'));
+            if (!price) return;
+
+            productCatalog.push({ id: Date.now(), name, price });
+            saveData();
+            renderCatalogMobile();
+        }
+
+        function renderCatalogMobile(filtered = null) {
+            const container = document.getElementById('catalogListMobile');
+            const products = filtered || productCatalog;
+            
+            if (products.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Aucun produit</div>';
+                return;
+            }
+
+            container.innerHTML = products.map(p => `
+                <div class="product-compact">
+                    <div class="product-info-compact">
+                        <div class="product-name-compact">${p.name}</div>
+                        <div class="product-details-compact">${formatMoney(p.price)}</div>
+                    </div>
+                    <button class="btn-remove" onclick="deleteCatalogProductMobile(${p.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function searchCatalogMobile() {
+            const term = document.getElementById('searchCatalogMobile').value.toLowerCase();
+            if (!term) {
+                renderCatalogMobile();
+                return;
+            }
+            const filtered = productCatalog.filter(p => 
+                p.name.toLowerCase().includes(term)
+            );
+            renderCatalogMobile(filtered);
+        }
+
+        function deleteCatalogProductMobile(id) {
+            if (!confirm('Supprimer ce produit ?')) return;
+            productCatalog = productCatalog.filter(p => p.id !== id);
+            saveData();
+            renderCatalogMobile();
+        }
+
+        // Déconnexion
+        function logoutMobile() {
+            if (confirm('Voulez-vous vraiment vous déconnecter ?\n\nL\'application sera verrouillée et vous devrez entrer votre code PIN pour y accéder à nouveau.')) {
+                // Effacer la session
+                sessionStorage.removeItem('appUnlocked');
+                // Afficher l'écran de verrouillage
+                document.getElementById('pinLockScreen').style.display = 'flex';
+                document.getElementById('pinInput').value = '';
+                document.getElementById('pinError').style.display = 'none';
+                // Retour à la page d'accueil
+                switchPageMobile('vente');
+            }
+        }
+
+        // Utilitaires
+        function formatMoney(amount) {
+            return Math.round(amount).toLocaleString('fr-FR') + ' FCFA';
+        }
+
+        // Payment method handler
+        document.getElementById('paymentMethodMobile').addEventListener('change', function() {
+            document.getElementById('partialFieldsMobile').style.display = this.value === 'partial' ? 'block' : 'none';
+        });
+
+        // Click outside modal to close
+        document.getElementById('editModalMobile').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModalMobile();
+        });
+
+        // ==========================================
+        // SYSTÈME DE CODE PIN
+        // ==========================================
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Afficher un bouton d'installation si pas encore installé
+            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                setTimeout(() => {
+                    if (confirm('Voulez-vous installer cette application sur votre ecran d\'accueil pour un acces rapide ?')) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            deferredPrompt = null;
+                        });
+                    }
+                }, 3000);
+            }
+        });
+    </script>
+
+<!-- Scripts Auth -->
+
+<!-- FIREBASE + AUTH -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const app = initializeApp({
+    apiKey: "AIzaSyAB0oBI4Iwnrz86NaLxu8pIwmWr9VyLGVM",
+    authDomain: "gestion-des-ventes-et-services.firebaseapp.com",
+    projectId: "gestion-des-ventes-et-services",
+    storageBucket: "gestion-des-ventes-et-services.firebasestorage.app",
+    messagingSenderId: "635196425100",
+    appId: "1:635196425100:web:20123bd2d82f6be342cca9"
+});
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window._auth = auth;
+window._db = db;
+window._signOut = signOut;
+
+// Fonctions login/register exposées
+window.doLogin = async function() {
+    const email = document.getElementById('iEmail').value.trim();
+    const pwd = document.getElementById('iPwd').value;
+    if (!email || !pwd) { showErr('Entrez email et mot de passe'); return; }
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true; btn.textContent = '⏳...';
+    try {
+        const cred = await signInWithEmailAndPassword(auth, email, pwd);
+        const snap = await getDoc(doc(db, 'users', cred.user.uid));
+        if (!snap.exists()) {
+            await signOut(auth);
+            btn.disabled = false; btn.textContent = '🔓 Se Connecter';
+            showErr('Compte introuvable. Réinscrivez-vous.');
+            return;
+        }
+        const data = snap.data();
+        if (data.status !== 'active') {
+            await signOut(auth);
+            btn.disabled = false; btn.textContent = '🔓 Se Connecter';
+            showErr('Compte non activé. Contactez l\'administrateur.');
+            return;
+        }
+        if (data.subscriptionEnd) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const end = new Date(data.subscriptionEnd); end.setHours(0,0,0,0);
+            if (today > end) {
+                await signOut(auth);
+                btn.disabled = false; btn.textContent = '🔓 Se Connecter';
+                showErr('Abonnement expiré le ' + data.subscriptionEnd);
+                return;
+            }
+        }
+        // ✅ SUCCÈS - Cacher auth, montrer app
+        document.getElementById('authOverlay').classList.add('hide');
+        document.getElementById('userEmailDisplay').textContent = '👤 ' + data.name;
+        btn.disabled = false; btn.textContent = '🔓 Se Connecter';
+        
+        // Charger les données après un court délai
+        setTimeout(() => {
+            try {
+                if (window.loadData) {
+                    window.loadData();
+                }
+            } catch(err) {
+                console.error('Erreur loadData:', err);
+            }
+        }, 100);
+    } catch (e) {
+        console.error('Erreur login:', e);
+        btn.disabled = false; btn.textContent = '🔓 Se Connecter';
+        showErr('Email ou mot de passe incorrect');
+    }
+};
+
+window.doRegister = async function() {
+    const name = document.getElementById('iName').value.trim();
+    const email = document.getElementById('iRegEmail').value.trim();
+    const pwd = document.getElementById('iRegPwd').value;
+    const pwd2 = document.getElementById('iRegPwd2').value;
+    if (!name||!email||!pwd) { showErr('Remplissez tous les champs'); return; }
+    if (pwd !== pwd2) { showErr('Mots de passe différents'); return; }
+    if (pwd.length < 6) { showErr('Mot de passe trop court (min. 6)'); return; }
+    const btn = document.getElementById('btnReg');
+    btn.disabled = true; btn.textContent = '⏳...';
+    try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+        await updateProfile(cred.user, { displayName: name });
+        await setDoc(doc(db, 'users', cred.user.uid), {
+            name, email, status: 'inactive', role: 'user',
+            subscriptionEnd: '', createdAt: new Date().toISOString()
+        });
+        await signOut(auth);
+        btn.disabled = false; btn.textContent = '✅ Créer mon Compte';
+        showOk('Compte créé ! Attendez l\'activation par l\'administrateur.');
+        setTimeout(() => {
+            goTo('Login');
+            document.getElementById('iEmail').value = email;
+        }, 2500);
+    } catch (e) {
+        btn.disabled = false; btn.textContent = '✅ Créer mon Compte';
+        showErr(e.code === 'auth/email-already-in-use' ? 'Email déjà utilisé' : e.message);
+    }
+};
+
+window.doReset = async function() {
+    const email = document.getElementById('iForgot').value.trim();
+    if (!email) { showErr('Entrez votre email'); return; }
+    try {
+        await sendPasswordResetEmail(auth, email);
+        showOk('Email envoyé ! Vérifiez votre boîte.');
+        setTimeout(() => goTo('Login'), 3000);
+    } catch (e) {
+        showErr('Aucun compte trouvé avec cet email');
+    }
+};
+
+window.logoutEmail = function() {
+    if (confirm('Se déconnecter ?')) {
+        signOut(auth).then(() => {
+            document.getElementById('authOverlay').classList.remove('hide');
+            document.getElementById('authOverlay').style.display = 'flex';
+        });
+    }
+};
+</script>
+
+<script>
+function showErr(msg) {
+    const e = document.getElementById('aerr'), o = document.getElementById('aok');
+    o.style.display = 'none';
+    e.textContent = '❌ ' + msg; e.style.display = 'block';
+    setTimeout(() => e.style.display = 'none', 6000);
+}
+function showOk(msg) {
+    const e = document.getElementById('aerr'), o = document.getElementById('aok');
+    e.style.display = 'none';
+    o.textContent = '✅ ' + msg; o.style.display = 'block';
+    setTimeout(() => o.style.display = 'none', 5000);
+}
+function goTo(form) {
+    ['Login','Reg','Forgot'].forEach(f => document.getElementById('f'+f).classList.add('ahide'));
+    document.getElementById('f'+form).classList.remove('ahide');
+    const t = {Login:'Connectez-vous', Reg:'Créez votre compte', Forgot:'Mot de passe oublié'};
+    document.getElementById('asub').textContent = t[form];
+}
+</script>
+
+</body>
+</html>
